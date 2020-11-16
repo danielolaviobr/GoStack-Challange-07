@@ -33,8 +33,6 @@ const CartProvider: React.FC = ({ children }) => {
       const storedProducts = await AsyncStorage.getItem('products');
       if (storedProducts) {
         setProducts(JSON.parse(storedProducts));
-      } else {
-        setProducts([]);
       }
     }
 
@@ -43,18 +41,14 @@ const CartProvider: React.FC = ({ children }) => {
 
   const addToCart = useCallback(
     async (product: Product) => {
-      const cartProduct = { ...product, quantity: 1 };
-      const shoudlAddProduct = products.findIndex(
-        prod => cartProduct.id === prod.id,
-      );
-      const cart =
-        shoudlAddProduct < 0
-          ? [...products, cartProduct]
-          : products.map(prod =>
-              prod.id === cartProduct.id
-                ? { ...prod, quantity: prod.quantity + 1 }
-                : prod,
-            );
+      const productExist = products.find(prod => product.id === prod.id);
+      const cart = productExist
+        ? [...products, { ...product, quantity: 1 }]
+        : products.map(prod =>
+            prod.id === product.id
+              ? { ...prod, quantity: prod.quantity + 1 }
+              : prod,
+          );
       setProducts(cart);
       await AsyncStorage.setItem('products', JSON.stringify(cart));
     },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
-import { View, Image } from 'react-native';
+import { View } from 'react-native';
 
 import formatValue from '../../utils/formatValue';
 import { useCart } from '../../hooks/cart';
@@ -29,7 +29,7 @@ interface Product {
 }
 
 const Dashboard: React.FC = () => {
-  const { addToCart, increment } = useCart();
+  const { addToCart } = useCart();
 
   const [products, setProducts] = useState<Product[]>([]);
 
