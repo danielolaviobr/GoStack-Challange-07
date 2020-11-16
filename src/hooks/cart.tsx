@@ -30,23 +30,66 @@ const CartProvider: React.FC = ({ children }) => {
 
   useEffect(() => {
     async function loadProducts(): Promise<void> {
-      // TODO LOAD ITEMS FROM ASYNC STORAGE
+      const storedProducts = await AsyncStorage.getItem('products');
+      if (storedProducts) {
+        setProducts(JSON.parse(storedProducts));
+      } else {
+        setProducts([]);
+      }
     }
 
     loadProducts();
   }, []);
 
-  const addToCart = useCallback(async product => {
-    // TODO ADD A NEW ITEM TO THE CART
-  }, []);
+  const addToCart = useCallback(
+    async (product: Product) => {
+      const cartProduct = { ...product, quantity: 1 };
+      const shoudlAddProduct = products.findIndex(
+        prod => cartProduct.id === prod.id,
+      );
+      const cart =
+        shoudlAddProduct < 0
+          ? [...products, cartProduct]
+          : products.map(prod =>
+              prod.id === cartProduct.id
+                ? { ...prod, quantity: prod.quantity + 1 }
+                : prod,
+            );
+      setProducts(cart);
+      await AsyncStorage.setItem('products', JSON.stringify(cart));
+    },
+    [products],
+  );
 
-  const increment = useCallback(async id => {
-    // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+  const increment = useCallback(
+    async id => {
+      const cart = products.map(product =>
+        product.id === id
+          ? { ...product, quantity: product.quantity + 1 }
+          : product,
+      );
+      setProducts(cart);
+      await AsyncStorage.setItem('products', JSON.stringify(cart));
+    },
+    [products],
+  );
 
-  const decrement = useCallback(async id => {
-    // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-  }, []);
+  const decrement = useCallback(
+    async id => {
+      const cart = products.map(product =>
+        product.id === id
+          ? { ...product, quantity: product.quantity - 1 }
+          : product,
+      );
+
+      setProducts(cart.filter(product => product.quantity > 0));
+      await AsyncStorage.setItem(
+        'products',
+        JSON.stringify(cart.filter(product => product.quantity > 0)),
+      );
+    },
+    [products],
+  );
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
