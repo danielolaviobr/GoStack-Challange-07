@@ -43,12 +43,12 @@ const CartProvider: React.FC = ({ children }) => {
     async (product: Product) => {
       const productExist = products.find(prod => product.id === prod.id);
       const cart = productExist
-        ? [...products, { ...product, quantity: 1 }]
-        : products.map(prod =>
+        ? products.map(prod =>
             prod.id === product.id
               ? { ...prod, quantity: prod.quantity + 1 }
               : prod,
-          );
+          )
+        : [...products, { ...product, quantity: 1 }];
       setProducts(cart);
       await AsyncStorage.setItem('products', JSON.stringify(cart));
     },
